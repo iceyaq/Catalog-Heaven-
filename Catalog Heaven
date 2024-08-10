@@ -1,0 +1,271 @@
+-- Full Script for Catalog Heaven with Seanork's Rocket Jumper
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Error Handling Function
+local function safeCall(func)
+    local success, result = pcall(func)
+    if not success then
+        warn("Error: " .. tostring(result))
+    end
+end
+
+-- Notification GUI
+local function sendNotification(message)
+    safeCall(function()
+        local gui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+        local frame = Instance.new("Frame", gui)
+        frame.Size = UDim2.new(0, 300, 0, 100)
+        frame.Position = UDim2.new(0.5, -150, 0.5, -50)
+        frame.BackgroundTransparency = 0.5
+        frame.BackgroundColor3 = Color3.new(1, 1, 1) -- White background
+
+        local textLabel = Instance.new("TextLabel", frame)
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.Text = message
+        textLabel.TextColor3 = Color3.new(0, 0, 0) -- Black text color
+        textLabel.BackgroundTransparency = 1
+        textLabel.Font = Enum.Font.SourceSans
+        textLabel.TextScaled = true
+
+        -- Automatically remove the notification after 500 seconds
+        wait(500)
+        gui:Destroy()
+    end)
+end
+
+-- Create Rocket Function
+local function createRocket()
+    safeCall(function()
+        local tool = LocalPlayer.Backpack:FindFirstChild("Rocket Jumper")
+        if not tool then
+            sendNotification("Rocket Jumper not found!")
+            return
+        end
+
+        local rocket = tool:FindFirstChild("Handle"):Clone()
+        rocket.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 5, 0)
+        rocket.Parent = workspace
+        return rocket
+    end)
+end
+
+-- Command Functions
+local function spamRockets()
+    safeCall(function()
+        for i = 1, 10 do
+            local rocket = createRocket()
+            rocket.Velocity = Vector3.new(math.random(-10, 10), math.random(20, 50), math.random(-10, 10))
+            wait(1)
+        end
+    end)
+end
+
+local function orbitRockets(targetPlayer)
+    safeCall(function()
+        for i = 1, 5 do
+            local rocket = createRocket()
+            local angle = (i / 5) * 2 * math.pi
+            local radius = 5
+            local offset = Vector3.new(math.sin(angle) * radius, 0, math.cos(angle) * radius)
+            rocket.Position = targetPlayer.Character.HumanoidRootPart.Position + offset
+            rocket.Anchored = true
+            wait(1)
+        end
+    end)
+end
+
+local function lineRockets(positionType)
+    safeCall(function()
+        for i = 1, 5 do
+            local rocket = createRocket()
+            local offset
+            if positionType == "behind" then
+                offset = Vector3.new(0, 0, -i * 5)
+            elseif positionType == "infront" then
+                offset = Vector3.new(0, 0, i * 5)
+            elseif positionType == "lineup" then
+                offset = Vector3.new(i * 5, 0, 0)
+            end
+            rocket.Position = LocalPlayer.Character.HumanoidRootPart.Position + offset
+            rocket.Anchored = true
+            wait(0.5)
+        end
+    end)
+end
+
+local function activateBotMode()
+    safeCall(function()
+        while true do
+            for _, targetPlayer in pairs(Players:GetPlayers()) do
+                if targetPlayer ~= LocalPlayer then
+                    local rocket = createRocket()
+                    rocket.Position = targetPlayer.Character.HumanoidRootPart.Position
+                    wait(2)
+                end
+            end
+        end
+    end)
+end
+
+local function createCloud()
+    safeCall(function()
+        local cloud = Instance.new("Part")
+        cloud.Size = Vector3.new(50, 1, 50)
+        cloud.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 10, 0)
+        cloud.Anchored = true
+        cloud.Parent = workspace
+    end)
+end
+
+local function enableFlying()
+    safeCall(function()
+        LocalPlayer.Character.Humanoid.PlatformStand = true
+    end)
+end
+
+local function disableFlying()
+    safeCall(function()
+        LocalPlayer.Character.Humanoid.PlatformStand = false
+    end)
+end
+
+local function setSpeed(value)
+    safeCall(function()
+        LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(value) or 16
+    end)
+end
+
+local function enableInfiniteJump()
+    safeCall(function()
+        local humanoid = LocalPlayer.Character.Humanoid
+        humanoid.Jumping:Connect(function()
+            humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        end)
+    end)
+end
+
+local function disableInfiniteJump()
+    safeCall(function()
+        local humanoid = LocalPlayer.Character.Humanoid
+        humanoid.Jumping:Disconnect()
+    end)
+end
+
+local function spinCharacter()
+    safeCall(function()
+        LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(360), 0)
+    end)
+end
+
+local function danceCharacter()
+    safeCall(function()
+        LocalPlayer.Character:LoadAnimation(Instance.new("Animation")):Play()
+    end)
+end
+
+local function spasmCharacter()
+    safeCall(function()
+        while true do
+            LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0)
+            wait(0.1)
+        end
+    end)
+end
+
+local function giveTool(toolName)
+    safeCall(function()
+        local tool = Instance.new("Tool")
+        tool.Name = toolName
+        tool.Parent = LocalPlayer.Backpack
+    end)
+end
+
+local function teleportToPlayer(playerName)
+    safeCall(function()
+        local targetPlayer = Players:FindFirstChild(playerName)
+        if targetPlayer then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+        else
+            sendNotification("Player not found.")
+        end
+    end)
+end
+
+local function teleportToPosition(x, y, z)
+    safeCall(function()
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(tonumber(x), tonumber(y), tonumber(z))
+    end)
+end
+
+-- Command Processor
+local function processCommand(command, args)
+    safeCall(function()
+        if command == "!start" then
+            spamRockets()
+        elseif command == "!orbit" then
+            local targetPlayer = Players:FindFirstChild(args[1])
+            if targetPlayer then
+                orbitRockets(targetPlayer)
+            else
+                sendNotification("Player not found.")
+            end
+        elseif command == "!line" then
+            lineRockets(args[1])
+        elseif command == "!bot" then
+            activateBotMode()
+        elseif command == "!cloud" then
+            createCloud()
+        elseif command == "!fly" then
+            enableFlying()
+        elseif command == "!nofly" then
+            disableFlying()
+        elseif command == "!speed" then
+            setSpeed(args[1])
+        elseif command == "!infjump" then
+            enableInfiniteJump()
+        elseif command == "!noinfjump" then
+            disableInfiniteJump()
+        elseif command == "!spin" then
+            spinCharacter()
+        elseif command == "!dance" then
+            danceCharacter()
+        elseif command == "!spasm" then
+            spasmCharacter()
+        elseif command == "!give" then
+            giveTool(args[1])
+        elseif command == "!tp" then
+            if #args == 1 then
+                teleportToPlayer(args[1])
+            elseif #args == 3 then
+                teleportToPosition(args[1], args[2], args[3])
+            else
+                sendNotification("Invalid teleport command.")
+            end
+        elseif command == "!rank" then
+            local playerName = args[1]
+            if playerName then
+                local targetPlayer = Players:FindFirstChild(playerName)
+                if targetPlayer then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+                    LocalPlayer:Chat("Commands: !start, !orbit, !line, !bot, !cloud, !fly, !nofly, !speed, !infjump, !noinfjump, !spin, !dance, !spasm, !give, !tp")
+                    LocalPlayer:Chat("Seanork's Rocket Jumper only works with this script. Have fun!")
+                else
+                    sendNotification("Player not found.")
+                end
+            else
+                sendNotification("Player name required for ranking.")
+            end
+        else
+            sendNotification("Invalid command.")
+        end
+    end)
+end
+
+-- Command Listener
+LocalPlayer.Chatted:Connect(function(message)
+    local args = message:split(" ")
+    local command = table.remove(args, 1)
+    processCommand(command, args)
+end)
